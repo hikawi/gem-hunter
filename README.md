@@ -21,7 +21,7 @@ Main collaborators:
 
 To get started, there are packages that need to be installed. You can install them yourself:
 
-- `numpy` for representing data similar to array languages.
+- `numpy` for representing data similar to array languages. Could be needed for representing the grid.
 - `pysat` for solving the CNFs.
 - `mypy` for static type checking.
 - `pandas` for data frames, which may not be necessary, but good to have.
@@ -98,10 +98,6 @@ class HelloWorld:
 ```
 
 </details>
-
-### Typing with NumPy
-
-When using `numpy`, you can use the `numpy.typing` module to type your variables. For example, if you have a 2D array, you can use `numpy.typing.ArrayLike`. More information can be found [here](https://numpy.org/devdocs/reference/typing.html).
 
 ## Data Representation
 

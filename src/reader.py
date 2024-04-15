@@ -2,11 +2,10 @@ import numpy as np
 import numpy.typing as npt
 
 
-def read_data(file_path: str) -> npt.ArrayLike:
+def read_data(file_path: str) -> list[list[int]]:
     """Reads data from a file and returns it as a numpy array."""
-    lines: list[list[str]] = [s.strip().split(",")
-                              for s in open(file_path, "r").readlines()]
-    return np.array([-3 if arg == "_" else int(arg) for line in lines for arg in line]).reshape(len(lines), len(lines[0]))
+    return [[-3 if arg == "_" else int(arg) for arg in s.strip().split(",")]
+            for s in open(file_path, "r").readlines()]
 
 
 def match_data_element(value: int) -> str:
@@ -25,7 +24,7 @@ def match_data_element(value: int) -> str:
             return str(value)
 
 
-def write_data(file_path: str, data: npt.ArrayLike) -> None:
+def write_data(file_path: str, data: list[list[int]]) -> None:
     """Writes data to a file."""
     with open(file_path, "w") as file:
         for row in data:
