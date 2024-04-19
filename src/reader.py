@@ -4,6 +4,14 @@ def read_data(file_path: str) -> list[list[int]]:
             for s in open(file_path, "r").readlines()]
 
 
+def print_data(data: list[list[int]]) -> None:
+    """Prints the data in a readable format."""
+    for row in data:
+        for elem in row:
+            print(f"{elem:>4}", end=" ")
+        print()
+
+
 def match_data_element(value: int) -> str:
     """Converts a value to a string.
        -3 is an unknown cell.
