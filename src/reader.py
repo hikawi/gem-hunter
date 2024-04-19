@@ -1,7 +1,3 @@
-import numpy as np
-import numpy.typing as npt
-
-
 def read_data(file_path: str) -> list[list[int]]:
     """Reads data from a file and returns it as a numpy array."""
     return [[-3 if arg == "_" else int(arg) for arg in s.strip().split(",")]
@@ -29,8 +25,3 @@ def write_data(file_path: str, data: list[list[int]]) -> None:
     with open(file_path, "w") as file:
         for row in data:
             file.write(",".join(map(match_data_element, row)) + "\n")
-
-
-data = read_data("./test/input.txt")
-print(data)
-write_data("./test/output.txt", data)

@@ -22,7 +22,7 @@ Main collaborators:
 To get started, there are packages that need to be installed. You can install them yourself:
 
 - `numpy` for representing data similar to array languages. Could be needed for representing the grid.
-- `pysat` for solving the CNFs.
+- `python-sat` for solving the CNFs. (my bad, I thought `pysat` was it, but `pysat` is for _satellite data analysis_)
 - `mypy` for static type checking.
 - `pandas` for data frames, which may not be necessary, but good to have.
 
@@ -107,7 +107,3 @@ Data will be represented as a number grid, with the following rules:
 - A number `-1` represents a **mine**.
 - A number `-2` represents a **gem**.
 - A number `-3` represents an **unknown** cell.
-
-```
-
-```
