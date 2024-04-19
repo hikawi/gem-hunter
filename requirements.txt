@@ -15,9 +15,9 @@ pandas==2.2.2
 partd==1.4.1
 pluggy==1.4.0
 portalocker==2.8.2
-pysat==3.2.0
 pytest==8.1.1
 python-dateutil==2.9.0.post0
+python-sat==1.8.dev10
 pytz==2024.1
 PyYAML==6.0.1
 scipy==1.13.0
