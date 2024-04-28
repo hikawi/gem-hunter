@@ -12,8 +12,8 @@ class Board:
         return self.board[at[1]][at[0]]
 
     def dims(self) -> tuple[int, int]:
-        """Returns the dimensions of the board."""
-        return len(self.board), len(self.board[0])
+        """Returns the dimensions of the board in the order x,y"""
+        return len(self.board[0]), len(self.board)
 
     def is_blurred(self) -> bool:
         """Checks if the board is blurred. A blurred board means that it only contains

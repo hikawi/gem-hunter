@@ -49,13 +49,14 @@ def generate_dnf(board: Board, at: tuple[int, int]) -> list[list[int]]:
     # Each run is a combination of 3 neighbors, the ones chosen in the run are MINES
     # and the ones not chosen are GEMS. There are 5 choose 3 cases.
     for run in itertools.combinations(neighbors, board[at]):
-        clause = [-i if i in run else i for i in neighbors]
+        clause = [i if i in run else -i for i in neighbors]
         clauses.append(clause)
 
     return clauses
 
 
 def convert_dnf_to_cnf(groups: list[list[int]]) -> list[list[int]]:
+    """Convert dnf to cnf"""
     cnf = [set()]
     for group in groups:
         new_literals = {frozenset([literal]): -literal for literal in group}
@@ -71,67 +72,44 @@ def convert_dnf_to_cnf(groups: list[list[int]]) -> list[list[int]]:
 
 
 def flatten_list(init: list[int]) -> list[int]:
-    """flattem a list to a lower dimension list"""
-    new_list = []
+    """flatten a list to a lower dimension list"""
+    new_list: list[int]
     for conjunction in init:
         new_list.extend(conjunction)
     return new_list
 
 
-def generate_cnf(board: list[int]) -> list[list[int]]:
+def generate_cnf(board: Board) -> list[list[int]]:
     """Generates a DNF formula for the given cell at (x, y) in board.
        The DNF formula is a list of clauses, where each clause is a list of literals.
        For example, returning [[1, 2, 3], [-4, -5, -6]] means that:
        (x1 v x2 v x3) ∧ (¬x4 v ¬x5 v ¬x6)"""
 
     cnf: list[list[int]] = []
-    # reader.print_data(board)
-
-    # Loop through all cells in (x, y) form.
-    for (x, y) in itertools.product(range(len(board[0])), range(len(board))):
-        # Unknown cell (-3). If it's -1 or -2, the input board is invalid.
-        if board[y][x] < 0:
-            continue
-
-        dnf: list[list[int]] = []
-        # Basically, the idea is, if there are 5 unknown cells around it.
-        # And the number says there are 3 traps.
-        # This will have to spit out a clause that says:
-        # (x1 ∧ x2 ∧ x3 ∧ ¬x4 ∧ ¬x5) ∨ (x1 ∧ x2 ∧ ¬x3 ∧ x4 ∧ ¬x5) ∨ (x1 ∧ x2 ∧ ¬x3 ∧ ¬x4 ∧ x5) ∨ ...
-        neighbors = get_valid_neighbors(board, (x, y))
-
-        # Now, we generate the clauses.
-        # As there are board[y][x] traps in len(neighbors) cells.
-        # This is just a combination of the neighbors.
-        for run in itertools.combinations(neighbors, board[y][x]):
-            clause = [i if i in run else -
-                      i for i in neighbors]
-            if not clause:
+    dims = board.dims()
+   
+    for y in range(dims[0]):
+        for x in range(dims[1]):
+            dnf = generate_dnf(board, (x, y))
+            if not dnf:
                 continue
-            dnf.append(clause)
-
-        if not dnf:
-            continue
-        print(dnf)
-        # change the dnf we get above to cnf
-        cnf.append(convert_dnf_to_cnf(dnf))
-        dnf.clear()
+            # change the dnf we get above to cnf
+            cnf.append(convert_dnf_to_cnf(dnf))
+            dnf.clear()
 
     return cnf
 
-
-def get_unknown_cells(board: list[list[int]]) -> list[int]:
+def get_unknown_cells(board: Board) -> list[int]:
     """consider a 2D list: board as an list which has value form 1 to len(board)^2
        this function gets the value of this list of the unknown cells in board(-2, -1)
        and sorts them, this is suitable for the CNF model of pysat lib"""
-    rows = len(board)
-    cols = len(board[0])
+    dims = board.dims() 
 
     unknown_cells: list[int] = []
-    for i in range(rows):
-        for j in range(cols):
-            if board[i][j] < 0:  # unknown cell has value < 0
-                unknown_cells.append(i * rows + j + 1)
+    for x in range(dims[0]):
+        for y in range(dims[1]):
+            if board[x,y] < 0:  # unknown cell has value < 0
+                unknown_cells.append(y * dims[0] + x + 1)
     unknown_cells.sort()
     return unknown_cells
 
@@ -193,12 +171,14 @@ def find_trap_gem_cell(board: list[list[int]]) -> list[int]:
     return model
 
 
-board = randomize_board(5, 5, 10, 2)
+board = randomize_board(3, 3, 2, 2)
 print("Board")
 reader.print_data(board)
 
-for y in range(5):
-    for x in range(5):
-        print(x, y)
-        print(generate_dnf(board, (x, y)))
-    print()
+print("Traps and gems: ", find_trap_gem_cell(board))
+
+# for y in range(5):
+#     for x in range(5):
+#         print(x, y)
+#         print(generate_dnf(board, (x, y)))
+#     print()
