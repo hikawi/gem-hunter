@@ -1,12 +1,15 @@
-def read_data(file_path: str) -> list[list[int]]:
+from board import Board
+
+
+def read_data(file_path: str) -> Board:
     """Reads data from a file and returns it as a numpy array."""
-    return [[-3 if arg == "_" else int(arg) for arg in s.strip().split(",")]
-            for s in open(file_path, "r").readlines()]
+    return Board([[-3 if arg == "_" else int(arg) for arg in s.strip().split(",")]
+                  for s in open(file_path, "r").readlines()])
 
 
-def print_data(data: list[list[int]]) -> None:
+def print_data(data: Board) -> None:
     """Prints the data in a readable format."""
-    for row in data:
+    for row in data.board:
         for elem in row:
             print(f"{elem:>4}", end=" ")
         print()
@@ -28,8 +31,8 @@ def match_data_element(value: int) -> str:
             return str(value)
 
 
-def write_data(file_path: str, data: list[list[int]]) -> None:
+def write_data(file_path: str, data: Board) -> None:
     """Writes data to a file."""
     with open(file_path, "w") as file:
-        for row in data:
+        for row in data.board:
             file.write(",".join(map(match_data_element, row)) + "\n")
