@@ -170,13 +170,138 @@ def find_trap_gem_cell(board: list[list[int]]) -> list[int]:
 
     return model
 
+#convert cua Duc
+#def convert_dnf_to_cnf(groups: list[list[int]])-> list[list[int]]:
+#     """The DNF formula is a list of clauses, where each clause is a list of literals.
+#        For example,[[1, 2, 3], [-4, -5, -6]] means that:
+#        (x1 ∧ x2 ∧ x3) ∨ (¬x4 ∧ ¬x5 ∧ ¬x6)
+#        The CNF formula will follow the same format"""
+    
+#     result=[]
+#     if (len(groups)==1):
+#         for i in groups:
+#             for j in i:
+#                 temp=[j]
+#                 result.append(temp)
+#         return result
+ 
+#     for i in groups[0]:
+#         temp=[]
+#         temp.append(i)
+#         for j in groups[1]:
+#             temp.append(j)
+#             dummy=temp[:]
+#             result.append(dummy)
+#             temp.pop()
+#         temp.pop()
+#     for i in range(2,len(groups)):
+#         result_temp=[]
+#         while(result):
+#             temp=result.pop()
+#             for y in groups[i]:
+#                 temp.append(y)
+#                 dummy=temp[:]
+#                 result_temp.append(dummy)
+#                 temp.pop()
+#         result=result_temp    
+#     return result  
+
+def check(clause:list[int], model:list[int]):
+    clause_symbol=set()
+    for i in clause:
+        clause_symbol.add(abs(i))
+    model_symbol=set()
+    for i in model:
+        model_symbol.add(abs(i))
+    if(len(model_symbol)<len(clause_symbol)):
+        return True
+    for i in clause_symbol:
+        if  i not in model_symbol:
+            return True
+    for i in clause:
+        if i in model:
+            return True
+    return False
+def find_pure_symbol(symbols):
+    p=list(symbols)[:]
+    temp=[]
+    for i in symbols:
+        for j in symbols:
+            if i!=j and i+j==0:
+                temp.append(i)
+    for i in temp:
+        p.remove(i)
+    if len(p)==0:
+        return None
+    return p
+
+def find_unit_function(board):
+    p=set()
+    for i in board:
+        if len(i)==1:
+            p.add(i[0])
+    if len(p)==0:
+        return None
+    return p        
+
+def solve(board : list[list[int]],symbols, model:list[int],count,flag=0) -> list[int]:
+    for i in range(0,len(board)):
+        if check(board[i],model)==False:
+            return False
+        elif (i==len(board)-1 and len(model)==count):
+            return model
+    if flag==0:
+        p=find_pure_symbol(symbols)
+        if p!=None :
+            for i in p:
+                model.add(i)
+                symbols.discard(i)
+            return solve(board,symbols, model,count,1)
+    if flag==0:
+        p=find_unit_function(board)
+        if p!=None :
+            for i in p:
+                model.add(i)
+                symbols.discard(i)
+                if -i in symbols:
+                    symbols.discard(-i)
+            return solve(board, symbols, model,count,1)
+    q=symbols.pop()
+    if -q in symbols:
+        symbols.discard(-q)
+    store1=model.copy()
+    store2=symbols.copy()
+    model.add(q)
+    result=solve(board,symbols, model,count,1)
+    if(result!=False):
+        return result
+    model=store1.copy()
+    model.add(-q)
+    symbols=store2.copy()
+    result=solve(board,symbols, model,count,1)
+    if(result!=False):
+        return result
+    return False
+
+def run(board):
+    model=set()
+    symbols=set()
+    temp=flatten_list(generate_cnf(board))
+    for i in temp:
+        for j in i:
+            symbols.add(j)
+    count=set()
+    for i in symbols:
+        count.add(abs(i))
+    model=solve(temp,symbols,model,len(count))
+    print(model)
 
 board = randomize_board(3, 3, 2, 2)
 print("Board")
 reader.print_data(board)
 
 print("Traps and gems: ", find_trap_gem_cell(board))
-
+run(board)
 # for y in range(5):
 #     for x in range(5):
 #         print(x, y)
