@@ -1,5 +1,7 @@
 import reader
 import itertools
+import time
+import copy
 
 # the standard way to import PySAT:
 from pysat.formula import CNF
@@ -300,6 +302,40 @@ def solve(board : list[list[int]],symbols, model:list[int],count,flag=0) -> list
         return result
     return False
 
+
+def brute_force(board: list[list[int]], symbols, model, count):
+    symbols_copy = symbols.copy()
+    for i in range(0, len(board)):
+        if not check(board[i], model):
+            return None
+        elif i == len(board) - 1 and len(model) == count:
+            return model.copy()
+
+    if not symbols_copy:
+        return None
+    q = symbols_copy.pop()
+    if q is not None and -q in symbols_copy:
+        symbols_copy.discard(-q)
+
+    if q is not None:
+        model.add(q)
+        result = brute_force(board, symbols_copy, model, count)
+        if result:
+            return result
+        else:
+            model.remove(q)
+
+    if q is not None:
+        model.add(-q)
+        result = brute_force(board, symbols_copy, model, count)
+        if result:
+            return result
+        else:
+            model.remove(-q)
+
+    return None
+
+
 def run(board):
     model=set()
     symbols=set()
@@ -310,15 +346,31 @@ def run(board):
     count=set()
     for i in symbols:
         count.add(abs(i))
-    model=solve(temp,symbols,model,len(count))
+
+    # backtracking
+    start_time = time.time()
+    model = solve(temp, copy.deepcopy(symbols), model, len(count))
+    elapsed_time = time.time() - start_time
     print(model)
+    print("Backtracking solve time:", elapsed_time, "seconds")
+    print()
+
+    # brute-force
+    model = set()
+    start_time = time.time()
+    brute_force_model = brute_force(temp, symbols, model, len(count))
+    elapsed_time = time.time() - start_time
+    print(brute_force_model)
+    print("Brute-force solve time:", elapsed_time, "seconds")
+
+
 
 board = randomize_board(3, 3, 2, 2)
 print("Board")
 reader.print_data(board)
 
 print("Traps and gems: ", find_trap_gem_cell(board))
-# run(board)
+run(board)
 # for y in range(5):
 #     for x in range(5):
 #         print(x, y)
