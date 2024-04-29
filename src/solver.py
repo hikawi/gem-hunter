@@ -63,7 +63,7 @@ def convert_dnf_to_cnf(groups: list[list[int]]) -> list[list[int]]:
     # Iterate through each group in the DNF expression
     for group in groups:
         # Create a dictionary of new literals with their negations
-        new_literals = {frozenset([literal]): -literal for literal in group}
+        new_literals: dict[frozenset[int], int] = {frozenset([literal]): -literal for literal in group}
         # Initialize an empty list to store new CNF clauses
         new_cnf: list[int] = []
         
@@ -74,7 +74,7 @@ def convert_dnf_to_cnf(groups: list[list[int]]) -> list[list[int]]:
                 # Check if the negation of the current literal is not in the clause
                 if -new_literals[literal] not in clause:
                     # Create a new clause by adding the current literal to the current clause
-                    new_clause = set(clause).union({literal})
+                    new_clause: set[int] = set(clause).union({literal})
                     # Check if the new clause is not a subset of any existing clause in new CNF
                     if not any(new_clause.issubset(other) for other in new_cnf):
                         # Add the new clause to new CNF
