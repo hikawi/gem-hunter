@@ -57,23 +57,40 @@ def generate_dnf(board: Board, at: tuple[int, int]) -> list[list[int]]:
 
 def convert_dnf_to_cnf(groups: list[list[int]]) -> list[list[int]]:
     """Convert dnf to cnf"""
-    cnf = [set()]
+    # Initialize CNF with an empty clause
+    cnf : list[set[int]] = [set()]
+    
+    # Iterate through each group in the DNF expression
     for group in groups:
+        # Create a dictionary of new literals with their negations
         new_literals = {frozenset([literal]): -literal for literal in group}
-        new_cnf = []
+        # Initialize an empty list to store new CNF clauses
+        new_cnf: list[int] = []
+        
+        # Iterate through each clause in the current CNF
         for clause in cnf:
+            # Iterate through each new literal
             for literal in new_literals:
+                # Check if the negation of the current literal is not in the clause
                 if -new_literals[literal] not in clause:
+                    # Create a new clause by adding the current literal to the current clause
                     new_clause = set(clause).union({literal})
+                    # Check if the new clause is not a subset of any existing clause in new CNF
                     if not any(new_clause.issubset(other) for other in new_cnf):
+                        # Add the new clause to new CNF
                         new_cnf.append(new_clause)
+        
+        # Update CNF with the new CNF clauses
         cnf = new_cnf
+    
+    # Convert sets of literals to lists of integers and return the resulting CNF
     return [[int(next(iter(lit))) for lit in clause] for clause in cnf]
+
 
 
 def flatten_list(init: list[int]) -> list[int]:
     """flatten a list to a lower dimension list"""
-    new_list: list[int]
+    new_list: list[int] = []
     for conjunction in init:
         new_list.extend(conjunction)
     return new_list
@@ -301,7 +318,7 @@ print("Board")
 reader.print_data(board)
 
 print("Traps and gems: ", find_trap_gem_cell(board))
-run(board)
+# run(board)
 # for y in range(5):
 #     for x in range(5):
 #         print(x, y)
