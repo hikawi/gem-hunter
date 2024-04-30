@@ -304,34 +304,45 @@ def solve(board : list[list[int]],symbols, model:list[int],count,flag=0) -> list
 
 
 def brute_force(board: list[list[int]], symbols, model, count):
-    symbols_copy = symbols.copy()
+    """
+    This function is designed to perform a "brute force" algorithm,
+    using recursive method to try all possibilities of symbols on the board
+    """
+    symbols_copy = symbols.copy()  # avoid modifying the original set
     for i in range(0, len(board)):
+        # Check if the current row violates any constraints based on the model
         if not check(board[i], model):
             return None
+
+        # If we've reached the last row and assigned values to enough symbols, return the solution
         elif i == len(board) - 1 and len(model) == count:
             return model.copy()
 
     if not symbols_copy:
         return None
     q = symbols_copy.pop()
+
+    # If the symbol is not None and its negation is in the symbols set, discard it
     if q is not None and -q in symbols_copy:
         symbols_copy.discard(-q)
 
+    # Try assigning the positive value of the symbol and recursively call the function
     if q is not None:
         model.add(q)
         result = brute_force(board, symbols_copy, model, count)
         if result:
             return result
         else:
-            model.remove(q)
+            model.remove(q)  # If no solution is found, the value of q is removed from the model set
 
+    # Try assigning the negative value of the symbol and recursively call the function
     if q is not None:
         model.add(-q)
         result = brute_force(board, symbols_copy, model, count)
         if result:
             return result
         else:
-            model.remove(-q)
+            model.remove(-q)  # If no solution is found, the value of -q is removed from the model set
 
     return None
 
